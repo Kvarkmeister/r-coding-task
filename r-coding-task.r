@@ -25,14 +25,14 @@ main <- function() {
   excel_file <- here("Exercise Group A.xlsx")
   print(paste("Resolved file path:", excel_file))
   
-  # Import data for Surface Roughness (Rows 3-7)
-  surface_roughness_data <- import_data(excel_file, "Barchart", "Ra", header_row = 3, start_row = 3, end_row = 7)
-  
-  # Adjusted row range for Brinell Hardness (now using the correct header row)
-  hardness_data <- import_data(excel_file, "Barchart", "BH", header_row = 11, start_row = 12, end_row = 16)
-  
-  # Check for warnings after importing data
-  warnings()
+  # Suppress warnings while importing data
+  suppressWarnings({
+    # Import data for Surface Roughness (Rows 3-7)
+    surface_roughness_data <- import_data(excel_file, "Barchart", "Ra", header_row = 3, start_row = 3, end_row = 7)
+    
+    # Adjusted row range for Brinell Hardness (now using the correct header row)
+    hardness_data <- import_data(excel_file, "Barchart", "BH", header_row = 11, start_row = 12, end_row = 16)
+  })
   
   # Ensure we have valid data for both charts before creating them
   if (!is.null(surface_roughness_data) && nrow(surface_roughness_data) > 0) {
@@ -40,7 +40,7 @@ main <- function() {
     surface_roughness_chart <- create_bar_chart(surface_roughness_data, "Ra", "Surface Roughness (μm)", "Ra")
     if (!is.null(surface_roughness_chart)) {
       print(surface_roughness_chart)
-      ggsave("surface_roughness_chart.png", plot = surface_roughness_chart, width = 8, height = 6, dpi = 300)
+      ggsave("charts/surface_roughness_chart.png", plot = surface_roughness_chart, width = 8, height = 6, dpi = 300)
     }
   }
   
@@ -49,7 +49,7 @@ main <- function() {
     hardness_chart <- create_bar_chart(hardness_data, "BH", "Brinell Hardness (HB)", "BH")
     if (!is.null(hardness_chart)) {
       print(hardness_chart)
-      ggsave("hardness_chart.png", plot = hardness_chart, width = 8, height = 6, dpi = 300)
+      ggsave("charts/hardness_chart.png", plot = hardness_chart, width = 8, height = 6, dpi = 300)
     }
   }
 }
