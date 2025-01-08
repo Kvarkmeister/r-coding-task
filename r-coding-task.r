@@ -1,6 +1,7 @@
 library(here)
 library(readxl)
 library(ggplot2)
+library(gridExtra)  # For arranging multiple plots
 
 import_data <- function(filepath, sheetname, title, header_row, start_row, end_row) {
   tryCatch({
@@ -38,19 +39,19 @@ main <- function() {
   if (!is.null(surface_roughness_data) && nrow(surface_roughness_data) > 0) {
     # Create the Surface Roughness chart
     surface_roughness_chart <- create_bar_chart(surface_roughness_data, "Ra", "Surface Roughness (μm)", "Ra")
-    if (!is.null(surface_roughness_chart)) {
-      print(surface_roughness_chart)
-      ggsave("charts/surface_roughness_chart.png", plot = surface_roughness_chart, width = 8, height = 6, dpi = 300)
-    }
   }
   
   if (!is.null(hardness_data) && nrow(hardness_data) > 0) {
     # Create the Hardness chart
     hardness_chart <- create_bar_chart(hardness_data, "BH", "Brinell Hardness (HB)", "BH")
-    if (!is.null(hardness_chart)) {
-      print(hardness_chart)
-      ggsave("charts/hardness_chart.png", plot = hardness_chart, width = 8, height = 6, dpi = 300)
-    }
+  }
+  
+  # Combine the two charts into one PNG file vertically
+  if (!is.null(surface_roughness_chart) && !is.null(hardness_chart)) {
+    # Save both charts to a single image vertically
+    ggsave("charts/bar-chart.png", 
+           plot = grid.arrange(surface_roughness_chart, hardness_chart, ncol = 1), 
+           width = 8, height = 12, dpi = 300)
   }
 }
 
