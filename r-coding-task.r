@@ -41,6 +41,18 @@ create_line_plot <- function(data, title) {
           plot.title = element_text(hjust = 0.5, size = 16))  # Center plot title
 }
 
+# Function to create scatter plot
+create_scatter_plot <- function(data, title) {
+  ggplot(data, aes(x = Density, y = BH, color = Sample)) + 
+    geom_point(size = 3) +
+    geom_errorbar(aes(ymin = BH - BHSD, ymax = BH + BHSD), width = 0.2) +
+    scale_color_manual(values = c("steelblue", "darkorange", "forestgreen", "darkred")) + 
+    labs(title = title, x = "Density", y = "Brinell Hardness (BH)") +
+    theme_bw() +  # Set a white background
+    theme(text = element_text(family = "Arial Unicode MS"),
+          plot.title = element_text(hjust = 0.5, size = 16))  # Center plot title
+}
+
 # Main function
 main <- function() {
   excel_file <- here("Exercise Group A.xlsx")
@@ -54,7 +66,10 @@ main <- function() {
     line_plot_data <- read_excel(excel_file, sheet = "Line plot", range = cell_limits(c(4, 1), c(27, 3)), col_names = TRUE)
     colnames(line_plot_data) <- c("Sample", "Ra", "BH")
     
-    # Print the structure of surface_roughness_data, hardness_data, and line_plot_data to verify their content
+    # Import scatter plot data
+    scatter_data <- read_excel(excel_file, sheet = "Scatter", col_names = TRUE)
+    
+    # Print the structure of surface_roughness_data, hardness_data, line_plot_data, and scatter_data to verify their content
     print("Surface Roughness Data:")
     print(head(surface_roughness_data))  # Debug: check surface roughness data
     
@@ -63,6 +78,9 @@ main <- function() {
     
     print("Line Plot Data:")
     print(head(line_plot_data))  # Debug: check line plot data
+    
+    print("Scatter Plot Data:")
+    print(head(scatter_data))  # Debug: check scatter plot data
   })
   
   # Create bar chart for surface roughness and hardness
@@ -78,6 +96,12 @@ main <- function() {
   if (!is.null(line_plot_data) && nrow(line_plot_data) > 0) {
     line_plot <- create_line_plot(line_plot_data, "Surface Roughness vs Brinell Hardness")
     ggsave("charts/line-plot.png", plot = line_plot, width = 8, height = 6, dpi = 600)  # Save line plot with high DPI
+  }
+  
+  # Create scatter plot for BH vs Density
+  if (!is.null(scatter_data) && nrow(scatter_data) > 0) {
+    scatter_plot <- create_scatter_plot(scatter_data, "Scatter Plot of Brinell Hardness vs Density")
+    ggsave("charts/scatter-plot.png", plot = scatter_plot, width = 8, height = 6, dpi = 600)  # Save scatter plot with high DPI
   }
   
   # Save bar charts as a combined image with new file name
